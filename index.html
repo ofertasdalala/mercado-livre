@@ -240,7 +240,7 @@
                 return;
             }
 
-            const affiliateTag = (typeof CONFIG !== 'undefined') ? CONFIG.AFFILIATE_ID : "";
+            const affiliateTag = (typeof CONFIG !== 'undefined') ? CONFIG.AFFILIATE_ID : "vstoreon";
 
             if (!affiliateTag) {
                 alert('Atenção: A tag de afiliado não foi configurada corretamente.');
@@ -248,19 +248,22 @@
             }
 
             try {
-                // Remove qualquer fragmento (#...) ou parâmetros antigos de rastreio da URL original
+                // Limpa parâmetros de rastreamento antigos e fragmentos (#)
                 const urlObj = new URL(inputUrl);
-                urlObj.hash = ''; // Remove o # e rastreios antigos que estavam poluindo o link
+                urlObj.hash = '';
                 
-                // Limpa parâmetros de tracking anteriores para evitar conflito de comissão
-                urlObj.search = ''; 
-
-                // Adiciona a sua ferramenta/tag de afiliado de forma limpa
-                urlObj.searchParams.set('matt_tool', affiliateTag);
-
-                linkAfiliadoFinal = urlObj.toString();
+                // Se for um ID numérico de ferramenta (ex: 84123456), usa matt_tool
+                if (/^\d+$/.test(affiliateTag)) {
+                    urlObj.search = '';
+                    urlObj.searchParams.set('matt_tool', affiliateTag);
+                    linkAfiliadoFinal = urlObj.toString();
+                } else {
+                    // Se for a sua tag social (ex: vstoreon), limpa o rastreio e adiciona os parâmetros de indicação social
+                    urlObj.search = '';
+                    urlObj.searchParams.set('p', affiliateTag); // ou o parâmetro oficial de indicação da sua vitrine
+                    linkAfiliadoFinal = urlObj.toString();
+                }
             } catch (e) {
-                // Fallback caso a URL seja inválida
                 linkAfiliadoFinal = inputUrl;
             }
 
