@@ -163,17 +163,17 @@
     <div class="container">
         <!-- Abas do Topo -->
         <div class="tabs">
-            <div class="tab active" id="tab-link" onclick="switchTab('link')">🔗 Gerar Link</div>
+            <div class="tab active" id="tab-link" onclick="switchTab('link')">🔗 Ver na Vitrine</div>
             <div class="tab" id="tab-search" onclick="switchTab('search')">🔍 Pesquisar</div>
         </div>
 
-        <!-- Conteúdo da Aba 1: Gerar Link -->
+        <!-- Conteúdo da Aba 1: Gerar Link / Redirecionar para Vitrine -->
         <div id="content-link" class="tab-content active">
             <div class="input-group">
                 <span class="icon">📋</span>
                 <input type="text" id="product-link" placeholder="Cole aqui o link do produto do Mercado Livre...">
             </div>
-            <button class="btn-generate" onclick="gerarLinkAfiliadoML()">GERAR LINK COM DESCONTO ⚡</button>
+            <button class="btn-generate" onclick="redirecionarVitrineML()">ACESSAR VIA VITRINE ⚡</button>
         </div>
 
         <!-- Conteúdo da Aba 2: Pesquisar -->
@@ -187,9 +187,9 @@
 
         <!-- Caixa de Resultado -->
         <div id="result-box">
-            <div style="font-size: 14px; margin-bottom: 10px; color: #ffe600; font-weight: bold;">✨ Link de Afiliado Gerado com Sucesso!</div>
+            <div style="font-size: 14px; margin-bottom: 10px; color: #ffe600; font-weight: bold;">✨ Redirecionando para a Vitrine!</div>
             <button onclick="copiarLinkGerado()" style="background-color: #25d366; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">
-                📋 Copiar Link Curto
+                📋 Copiar Link da Vitrine
             </button>
         </div>
 
@@ -232,7 +232,7 @@
 
         let linkAfiliadoFinal = "";
 
-        function gerarLinkAfiliadoML() {
+        function redirecionarVitrineML() {
             const inputUrl = document.getElementById('product-link').value.trim();
             
             if (!inputUrl) {
@@ -247,25 +247,8 @@
                 return;
             }
 
-            try {
-                // Limpa parâmetros de rastreamento antigos e fragmentos (#)
-                const urlObj = new URL(inputUrl);
-                urlObj.hash = '';
-                
-                // Se for um ID numérico de ferramenta (ex: 84123456), usa matt_tool
-                if (/^\d+$/.test(affiliateTag)) {
-                    urlObj.search = '';
-                    urlObj.searchParams.set('matt_tool', affiliateTag);
-                    linkAfiliadoFinal = urlObj.toString();
-                } else {
-                    // Se for a sua tag social (ex: vstoreon), limpa o rastreio e adiciona os parâmetros de indicação social
-                    urlObj.search = '';
-                    urlObj.searchParams.set('p', affiliateTag); // ou o parâmetro oficial de indicação da sua vitrine
-                    linkAfiliadoFinal = urlObj.toString();
-                }
-            } catch (e) {
-                linkAfiliadoFinal = inputUrl;
-            }
+            // Redireciona para a vitrine social configurada (ex: https://www.mercadolivre.com.br/social/vstoreon)
+            linkAfiliadoFinal = `https://www.mercadolivre.com.br/social/${affiliateTag}`;
 
             document.getElementById('result-box').style.display = 'block';
             window.open(linkAfiliadoFinal, '_blank');
@@ -275,7 +258,7 @@
             if (!linkAfiliadoFinal) return;
             
             navigator.clipboard.writeText(linkAfiliadoFinal).then(() => {
-                alert('Link copiado para a área de transferência!');
+                alert('Link da vitrine copiado para a área de transferência!');
             }).catch(err => {
                 console.error('Erro ao copiar: ', err);
             });
