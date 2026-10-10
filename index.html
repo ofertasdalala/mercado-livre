@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Links e Busca - Mercado Livre</title>
+    <title>Vitrine e Busca - Mercado Livre</title>
     <script src="config.js"></script>
     <style>
         * {
@@ -53,8 +53,8 @@
         }
 
         .tab.active {
-            background-color: #ffe600; /* Amarelo do Mercado Livre */
-            color: #2d3277; /* Azul do Mercado Livre */
+            background-color: #ffe600; /* Amarelo Mercado Livre */
+            color: #2d3277; /* Azul Mercado Livre */
             box-shadow: 0 4px 12px rgba(255, 230, 0, 0.3);
         }
 
@@ -108,10 +108,28 @@
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(255, 230, 0, 0.3);
             transition: opacity 0.2s;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
 
         .btn-generate:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            background-color: #25d366;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            margin-bottom: 24px;
+        }
+
+        .btn-secondary:hover {
             opacity: 0.9;
         }
 
@@ -147,15 +165,6 @@
         .btn-social:hover {
             opacity: 0.9;
         }
-
-        #result-box {
-            display: none;
-            margin-bottom: 20px;
-            background: #2b2b2b;
-            padding: 16px;
-            border-radius: 12px;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
@@ -163,17 +172,14 @@
     <div class="container">
         <!-- Abas do Topo -->
         <div class="tabs">
-            <div class="tab active" id="tab-link" onclick="switchTab('link')">🔗 Ver na Vitrine</div>
+            <div class="tab active" id="tab-vitrine" onclick="switchTab('vitrine')">🛍️ Nossa Vitrine</div>
             <div class="tab" id="tab-search" onclick="switchTab('search')">🔍 Pesquisar</div>
         </div>
 
-        <!-- Conteúdo da Aba 1: Gerar Link / Redirecionar para Vitrine -->
-        <div id="content-link" class="tab-content active">
-            <div class="input-group">
-                <span class="icon">📋</span>
-                <input type="text" id="product-link" placeholder="Cole aqui o link do produto do Mercado Livre...">
-            </div>
-            <button class="btn-generate" onclick="redirecionarVitrineML()">ACESSAR VIA VITRINE ⚡</button>
+        <!-- Conteúdo da Aba 1: Ver na Vitrine -->
+        <div id="content-vitrine" class="tab-content active">
+            <button class="btn-generate" onclick="acessarVitrineML()">ABRIR VITRINE MERCADO LIVRE ⚡</button>
+            <button class="btn-secondary" onclick="copiarLinkVitrine()">📋 COPIAR LINK DA VITRINE</button>
         </div>
 
         <!-- Conteúdo da Aba 2: Pesquisar -->
@@ -183,14 +189,6 @@
                 <input type="text" id="search-keyword" placeholder="O que você procura no Mercado Livre?">
             </div>
             <button class="btn-generate" onclick="pesquisarML()">BUSCAR NO MERCADO LIVRE 🛍️</button>
-        </div>
-
-        <!-- Caixa de Resultado -->
-        <div id="result-box">
-            <div style="font-size: 14px; margin-bottom: 10px; color: #ffe600; font-weight: bold;">✨ Redirecionando para a Vitrine!</div>
-            <button onclick="copiarLinkGerado()" style="background-color: #25d366; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">
-                📋 Copiar Link da Vitrine
-            </button>
         </div>
 
         <!-- Botões Sociais -->
@@ -205,19 +203,37 @@
     </div>
     
     <script>
+        function getVitrineUrl() {
+            const affiliateTag = (typeof CONFIG !== 'undefined' && CONFIG.AFFILIATE_ID) ? CONFIG.AFFILIATE_ID : "vstoreon";
+            return `https://www.mercadolivre.com.br/social/${affiliateTag}`;
+        }
+
         function switchTab(type) {
-            document.getElementById('tab-link').classList.remove('active');
+            document.getElementById('tab-vitrine').classList.remove('active');
             document.getElementById('tab-search').classList.remove('active');
-            document.getElementById('content-link').classList.remove('active');
+            document.getElementById('content-vitrine').classList.remove('active');
             document.getElementById('content-search').classList.remove('active');
 
-            if (type === 'link') {
-                document.getElementById('tab-link').classList.add('active');
-                document.getElementById('content-link').classList.add('active');
+            if (type === 'vitrine') {
+                document.getElementById('tab-vitrine').classList.add('active');
+                document.getElementById('content-vitrine').classList.add('active');
             } else {
                 document.getElementById('tab-search').classList.add('active');
                 document.getElementById('content-search').classList.add('active');
             }
+        }
+
+        function acessarVitrineML() {
+            window.open(getVitrineUrl(), '_blank');
+        }
+
+        function copiarLinkVitrine() {
+            const url = getVitrineUrl();
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Link da vitrine copiado com sucesso!');
+            }).catch(err => {
+                console.error('Erro ao copiar: ', err);
+            });
         }
 
         function pesquisarML() {
@@ -228,40 +244,6 @@
             }
             const searchUrl = `https://lista.mercadolivre.com.br/${encodeURIComponent(query)}`;
             window.open(searchUrl, '_blank');
-        }
-
-        let linkAfiliadoFinal = "";
-
-        function redirecionarVitrineML() {
-            const inputUrl = document.getElementById('product-link').value.trim();
-            
-            if (!inputUrl) {
-                alert('Por favor, cole o link do produto do Mercado Livre.');
-                return;
-            }
-
-            const affiliateTag = (typeof CONFIG !== 'undefined') ? CONFIG.AFFILIATE_ID : "vstoreon";
-
-            if (!affiliateTag) {
-                alert('Atenção: A tag de afiliado não foi configurada corretamente.');
-                return;
-            }
-
-            // Redireciona para a vitrine social configurada (ex: https://www.mercadolivre.com.br/social/vstoreon)
-            linkAfiliadoFinal = `https://www.mercadolivre.com.br/social/${affiliateTag}`;
-
-            document.getElementById('result-box').style.display = 'block';
-            window.open(linkAfiliadoFinal, '_blank');
-        }
-
-        function copiarLinkGerado() {
-            if (!linkAfiliadoFinal) return;
-            
-            navigator.clipboard.writeText(linkAfiliadoFinal).then(() => {
-                alert('Link da vitrine copiado para a área de transferência!');
-            }).catch(err => {
-                console.error('Erro ao copiar: ', err);
-            });
         }
     </script>
 
