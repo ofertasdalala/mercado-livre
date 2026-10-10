@@ -247,18 +247,22 @@
                 return;
             }
 
-            // Tratativa para o link do Mercado Livre injetando a sua etiqueta/perfil social
-            let linkFinal = inputUrl;
             try {
+                // Remove qualquer fragmento (#...) ou parâmetros antigos de rastreio da URL original
                 const urlObj = new URL(inputUrl);
-                // Adiciona parâmetros de rastreio ou redireciona mantendo sua estrutura
-                urlObj.searchParams.set('matt_tool', affiliateTag);
-                linkFinal = urlObj.toString();
-            } catch (e) {
-                linkFinal = inputUrl;
-            }
+                urlObj.hash = ''; // Remove o # e rastreios antigos que estavam poluindo o link
+                
+                // Limpa parâmetros de tracking anteriores para evitar conflito de comissão
+                urlObj.search = ''; 
 
-            linkAfiliadoFinal = linkFinal;
+                // Adiciona a sua ferramenta/tag de afiliado de forma limpa
+                urlObj.searchParams.set('matt_tool', affiliateTag);
+
+                linkAfiliadoFinal = urlObj.toString();
+            } catch (e) {
+                // Fallback caso a URL seja inválida
+                linkAfiliadoFinal = inputUrl;
+            }
 
             document.getElementById('result-box').style.display = 'block';
             window.open(linkAfiliadoFinal, '_blank');
